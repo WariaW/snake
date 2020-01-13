@@ -1,6 +1,7 @@
 import time
 from os import system
-from pynput import keyboard
+#from pynput import keyboard
+from threading import Thread
 
 class Snake():
     def __init__(self):
@@ -8,15 +9,18 @@ class Snake():
         self.board = [[' '] * self.size[1] for i in range(self.size[0])]
         self.snake_position = [[2, 0], [3, 0], [4, 0], [5, 0]]
         self.direction = 'd'
+        self.get_direction_thread = Thread(target = self.get_input)
+        self.get_direction_thread.daemon = True
+        self.get_direction_thread.start()
 
-    def on_press(self, key):
-        if key in ['w', 'a', 's', 'd']:
-            self.direction = key
-
-    # Collect events until released
-    listener = keyboard.Listener(on_press=on_press)
-    listener.start()
-    #     listener.join()
+    # def on_press(self, key):
+    #     if key in ['w', 'a', 's', 'd']:
+    #         self.direction = key
+    #
+    # # Collect events until released
+    # listener = keyboard.Listener(on_press=on_press)
+    # listener.start()
+    # #     listener.join()
 
     def print_game_board(self):
         for i in range(0, self.size[0]):
@@ -24,7 +28,7 @@ class Snake():
                 print(' -', end='')
             print("")
             for j in range(0, self.size[1]):
-                print("|{}".format(' ' if [i, j] not in self.snake_position else u"\u25AE"), end='')
+                print("|{}".format(' ' if [i, j] not in self.snake_position else 'O'), end='')
             print("|")
         for i in range(0, self.size[1]):
             print(' -', end='')
@@ -48,10 +52,16 @@ class Snake():
         while(i < 15):
             _ = system('cls')
             self.print_game_board()
-            time.sleep(0.5)
+            self.get_direction_thread.join(timeout = 5)
             self.move()
 
             i += 1
+        self.get_direction_thread.stop()
+
+    def get_input(self):
+        self.direction = input("")
+        print("in therad")
+        return
 
 if __name__== "__main__":
     snake = Snake()
