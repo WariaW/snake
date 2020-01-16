@@ -1,13 +1,13 @@
 import time
 from os import system
 from pynput import keyboard
-from threading import Thread
+import random
 
 choice = ''
 def menu():
     global choice
     print("~~~~~~~~~~~~SNAKE~~~~~~~~~~~~")
-    print('Enter p to play or any other key to quit')
+    print('Enter g to play or any other key to quit')
     print('Press Esc on keyboard during game to end')
     choice = input('')
 
@@ -17,19 +17,23 @@ class Snake():
     def __init__(self):
         self.size = (15, 20)
         self.board = [[' '] * self.size[1] for i in range(self.size[0])]
-        # self.snake_position = [[2, 0], [3, 0], [4, 0], [5, 0]]
-        # self.direction = 'd'
-        # self.level = 1
-        # self.listen = False
+        self.level = 2
         self.init_state()
         self.listener = keyboard.Listener(on_press = self.on_press)
         self.listener.start()
 
     def init_state(self):
-        self.snake_position = [[2, 0], [3, 0], [4, 0], [5, 0]]
-        self.direction = 'd'
-        self.level = 1
+        self.snake_position = [[11, 0], [12, 0], [13, 0], [14, 0]]
+        self.direction = 'w'
         self.listen = False
+        if self.level > 1:
+            obs = [random.sample(range(self.size[0]), self.level * 2), random.sample(range(self.size[1]), self.level * 2)]
+            self.set_obstacles(obs)
+
+
+    def set_obstacles(self, obstacles):
+        for i in range(obstacles[0].__len__()):
+            self.board[obstacles[0][i]][obstacles[1][i]] = 'X'
 
     def on_press(self, key):
         global choice
@@ -46,13 +50,8 @@ class Snake():
     def print_game_board(self):
         for i in range(0, self.size[0]):
             for j in range(0, self.size[1]):
-                print(' -', end='')
-            print("")
-            for j in range(0, self.size[1]):
-                print("|{}".format(' ' if [i, j] not in self.snake_position else 'O'), end='')
+                print("|{}".format(self.board[i][j] if [i, j] not in self.snake_position else 'O'), end='')
             print("|")
-        for i in range(0, self.size[1]):
-            print(' -', end='')
         print("")
         print("")
 
@@ -70,7 +69,8 @@ class Snake():
             self.snake_position[0] = [self.snake_position[0][0], self.snake_position[0][1] - 1]
         if self.snake_position.count(self.snake_position[0]) > 1 \
                 or self.snake_position[0][0] < 0 or self.snake_position[0][0] > self.size[0] \
-                or self.snake_position[0][1] < 0 or self.snake_position[0][1] > self.size[0]:
+                or self.snake_position[0][1] < 0 or self.snake_position[0][1] > self.size[0]\
+                or self.board[self.snake_position[0][0]][self.snake_position[0][1]] == 'X':
             _ = system('cls')
             print("Looooooooser!!!")
             time.sleep(2)
