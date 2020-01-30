@@ -24,6 +24,11 @@ class Snake():
         self.listener = keyboard.Listener(on_press = self.on_press)
         self.listener.daemon = True
         self.listener.start()
+        self.append_apple = lambda: (apple := ([random.randint(0, self.size[0]), random.randint(0, self.size[1])], 0),
+                                self.apples.append(apple) if apple[0] not in (
+                                            self.obstacles + self.snake_position + [a[0] for a in
+                                                                                    self.apples]) else None)[-1]
+
 
     def init_state(self):
         self.snake_position = [[11, 0], [12, 0], [13, 0], [14, 0]]
@@ -46,12 +51,15 @@ class Snake():
         if key == keyboard.Key.esc:
             choice = 'q'
         elif self.listen == True:
-            if key.char in ['w', 's'] and self.direction in ['a', 'd']:
-                self.direction = key.char
-                self.listen = False
-            if key.char in ['a', 'd'] and self.direction in ['w', 's']:
-                self.direction = key.char
-                self.listen = False
+            try:
+                if key.char in ['w', 's'] and self.direction in ['a', 'd']:
+                    self.direction = key.char
+                    self.listen = False
+                if key.char in ['a', 'd'] and self.direction in ['w', 's']:
+                    self.direction = key.char
+                    self.listen = False
+            except AttributeError:
+                print('Use: W A S D to control the snake')
 
     def print_game_board(self):
         #print(self.apples)
@@ -66,6 +74,7 @@ class Snake():
         print("")
 
     def move(self):
+
         # return 0 if touch obstacle/edge
         # return 1 if eat apple
         # return 2 if reach gate to next level, level should increment by 1
@@ -100,19 +109,19 @@ class Snake():
             if self.lifes == 0:
                 choice = 'q'
             return 0
-        # snake ate apple
-        if self.board[self.snake_position[0][0]][self.snake_position[0][1]] == 'A':
-            print([i for i in self.apples if i[0] == [self.snake_position[0][0], self.snake_position[0][1]]])
-            print(self.apples.__len__())
-            self.apples.remove([i for i in self.apples if i[0] == [self.snake_position[0][0], self.snake_position[0][1]]][0])
-            self.board[self.snake_position[0][0]][self.snake_position[0][1]] = ' '
-            self.snake_position.append([self.snake_position[-1][0] - (self.snake_position[-2][0] - self.snake_position[-1][0]),
-                                        self.snake_position[-1][1] - (self.snake_position[-2][1] - self.snake_position[-1][1])])
         # snake reached the gate
         if self.board[self.snake_position[0][0]][self.snake_position[0][1]] == 'G':
             self.level = self.level + 1
             self.lifes = 3
             return 2
+        # snake ate apple
+        if self.board[self.snake_position[0][0]][self.snake_position[0][1]] == 'A':
+            # print([i for i in self.apples if i[0] == [self.snake_position[0][0], self.snake_position[0][1]]])
+            # print(self.apples.__len__())
+            self.apples.remove([i for i in self.apples if i[0] == [self.snake_position[0][0], self.snake_position[0][1]]][0])
+            self.board[self.snake_position[0][0]][self.snake_position[0][1]] = ' '
+            self.snake_position.append([self.snake_position[-1][0] - (self.snake_position[-2][0] - self.snake_position[-1][0]),
+                                        self.snake_position[-1][1] - (self.snake_position[-2][1] - self.snake_position[-1][1])])
         # snake reached required length to go to the next level
         if self.snake_position.__len__() >= self.level * 1 + 8 and self.gate == []:
             self.gate = [random.randint(0, self.size[0] - 1), random.randint(0, self.size[1] - 1)]
@@ -121,6 +130,22 @@ class Snake():
             self.board[self.gate[0]][self.gate[1]] = 'G'
         return 1
 
+    def do_some_stuff_with_apples(self):
+        number_of_apples = random.random()
+        if number_of_apples > 0.85:
+            print('new apple')
+            print(self.apples)
+            self.append_apple()
+            print(self.apples)
+            if number_of_apples > 0.92:
+                self.append_apple()
+                if number_of_apples > 0.97:
+                    self.append_apple()
+        for apple in self.apples:
+            if apple[1] > 19:
+                self.apples.remove(apple)
+            else:
+                apple[1] += 1
 
     def game(self):
         global choice
@@ -132,13 +157,14 @@ class Snake():
                 _ = system('cls')
                 self.print_game_board()
                 self.listen = True
-                time.sleep(1/2*self.level)
+                time.sleep(1/self.level)
                 self.listen = False
                 if self.move() in [0, 2]:
                     # self.lifes = self.lifes - 1
                     # if self.lifes == 0:
                     #     choice = 'q'
                     break
+                self.do_some_stuff_with_apples()
                 i += 1
 
 
