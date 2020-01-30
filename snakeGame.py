@@ -24,7 +24,7 @@ class Snake():
         self.listener = keyboard.Listener(on_press = self.on_press)
         self.listener.daemon = True
         self.listener.start()
-        self.append_apple = lambda: (apple := ([random.randint(0, self.size[0]), random.randint(0, self.size[1])], 0),
+        self.append_apple = lambda: (apple := [[random.randint(0, self.size[0]), random.randint(0, self.size[1])], 0],
                                 self.apples.append(apple) if apple[0] not in (
                                             self.obstacles + self.snake_position + [a[0] for a in
                                                                                     self.apples]) else None)[-1]
@@ -38,7 +38,7 @@ class Snake():
         self.board = [[' '] * self.size[1] for i in range(self.size[0])]
         for i in range(self.obstacles.__len__()):
             self.board[self.obstacles[i][0]][self.obstacles[i][1]] = 'X'
-        self.apples = [([7, 7], 0), ([14, 14], 0)]
+        self.apples = [[[7, 7], 0], [[14, 14], 0]]
         # apple = [random.randint(self.size[0]), random.randint(self.size[1])]
         # self.apples.append(apple if apple not in (self.obstacles + self.snake_position))
 
@@ -62,7 +62,6 @@ class Snake():
                 print('Use: W A S D to control the snake')
 
     def print_game_board(self):
-        #print(self.apples)
         for i in range(self.apples.__len__()):
             self.board[self.apples[i][0][0]][self.apples[i][0][1]] = 'A'
         print("Level: {}, lifes: {}".format(self.level, self.lifes))
