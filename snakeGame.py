@@ -24,15 +24,15 @@ class Snake():
         self.listener = keyboard.Listener(on_press = self.on_press)
         self.listener.daemon = True
         self.listener.start()
-        self.append_apple = lambda: (apple := [[random.randint(0, self.size[0]), random.randint(0, self.size[1])], 0],
+        self.append_apple = lambda: (apple := [[random.randint(0, self.size[0] - 1), random.randint(0, self.size[1] - 1)], 0],
                                 self.apples.append(apple) if apple[0] not in (
                                             self.obstacles + self.snake_position + [a[0] for a in
                                                                                     self.apples]) else None)[-1]
 
-
     def init_state(self):
         self.snake_position = [[11, 0], [12, 0], [13, 0], [14, 0]]
         self.gate = []
+        self.apples = []
         self.direction = 'w'
         self.listen = False
         self.board = [[' '] * self.size[1] for i in range(self.size[0])]
@@ -62,9 +62,10 @@ class Snake():
                 print('Use: W A S D to control the snake')
 
     def print_game_board(self):
+        print("Level: {}, lifes: {}".format(self.level, self.lifes))
+        print(self.apples)
         for i in range(self.apples.__len__()):
             self.board[self.apples[i][0][0]][self.apples[i][0][1]] = 'A'
-        print("Level: {}, lifes: {}".format(self.level, self.lifes))
         for i in range(0, self.size[0]):
             for j in range(0, self.size[1]):
                 print("|{}".format(self.board[i][j] if [i, j] not in (self.snake_position) else 'O'), end='')
@@ -132,10 +133,7 @@ class Snake():
     def do_some_stuff_with_apples(self):
         number_of_apples = random.random()
         if number_of_apples > 0.85:
-            print('new apple')
-            print(self.apples)
             self.append_apple()
-            print(self.apples)
             if number_of_apples > 0.92:
                 self.append_apple()
                 if number_of_apples > 0.97:
@@ -143,6 +141,7 @@ class Snake():
         for apple in self.apples:
             if apple[1] > 19:
                 self.apples.remove(apple)
+                self.board[apple[0][0]][apple[0][1]] = ' '
             else:
                 apple[1] += 1
 
