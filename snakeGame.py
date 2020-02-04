@@ -19,7 +19,6 @@ class Snake():
         self.lifes = 3
         self.level = 1
         self.obstacles = [[1,2], [13, 10], [12, 10], [12, 11], [14, 10]]
-        self.apples = []
         self.init_state()
         self.listener = keyboard.Listener(on_press = self.on_press)
         self.listener.daemon = True
@@ -34,47 +33,45 @@ class Snake():
         self.gate = []
         self.apples = []
         self.direction = 'w'
-        # self.listen = False
         self.board = [[' '] * self.size[1] for i in range(self.size[0])]
         for i in range(self.obstacles.__len__()):
             self.board[self.obstacles[i][0]][self.obstacles[i][1]] = 'X'
-        self.apples = [[[7, 7], 0], [[14, 14], 0]]
-        # apple = [random.randint(self.size[0]), random.randint(self.size[1])]
-        # self.apples.append(apple if apple not in (self.obstacles + self.snake_position))
+        self.append_apple()
+        self.append_apple()
+
 
     # def set_obstacles(self, obstacles):
     #     for i in range(obstacles[0].__len__()):
     #         self.board[obstacles[0][i]][obstacles[1][i]] = 'X'
 
+
     def on_press(self, key):
         global choice
         if key == keyboard.Key.esc:
             choice = 'q'
-        else: #if self.listen == True:
+        else:
             try:
                 if key.char in ['w', 's'] and self.direction in ['a', 'd']:
                     self.direction = key.char
-                    # self.listen = False
                 if key.char in ['a', 'd'] and self.direction in ['w', 's']:
                     self.direction = key.char
-                    # self.listen = False
             except AttributeError:
                 print('Use: W A S D to control the snake')
 
+
     def print_game_board(self):
-        print("Level: {}, lifes: {}".format(self.level, self.lifes))
-        print(self.apples)
+        print("Level: {}, lifes: {}\n".format(self.level, self.lifes))
         for i in range(self.apples.__len__()):
             self.board[self.apples[i][0][0]][self.apples[i][0][1]] = 'A'
         for i in range(0, self.size[0]):
             for j in range(0, self.size[1]):
-                print("|{}".format(self.board[i][j] if [i, j] not in (self.snake_position) else 'O'), end='')
+                print("|{}".format(self.board[i][j] if [i, j] not in self.snake_position else 'O'), end='')
             print("|")
         print("")
         print("")
 
-    def move(self):
 
+    def move(self):
         # return 0 if touch obstacle/edge
         # return 1 if eat apple
         # return 2 if reach gate to next level, level should increment by 1
@@ -145,11 +142,12 @@ class Snake():
             self.board[self.gate[0]][self.gate[1]] = 'G'
         return 1
 
+
     def do_some_stuff_with_apples(self):
         number_of_apples = random.random()
-        if number_of_apples > 0.85:
+        if number_of_apples > 0.87:
             self.append_apple()
-            if number_of_apples > 0.92:
+            if number_of_apples > 0.94:
                 self.append_apple()
                 if number_of_apples > 0.97:
                     self.append_apple()
@@ -160,6 +158,7 @@ class Snake():
             else:
                 apple[1] += 1
 
+
     def game(self):
         global choice
         self.lifes = 3
@@ -169,13 +168,8 @@ class Snake():
             while choice != 'q':
                 _ = system('cls')
                 self.print_game_board()
-                # self.listen = True
                 time.sleep(1/self.level)
-                # self.listen = False
                 if self.move() in [0, 2]:
-                    # self.lifes = self.lifes - 1
-                    # if self.lifes == 0:
-                    #     choice = 'q'
                     break
                 self.do_some_stuff_with_apples()
                 i += 1
