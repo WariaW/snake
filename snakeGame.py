@@ -34,7 +34,7 @@ class Snake():
         self.gate = []
         self.apples = []
         self.direction = 'w'
-        self.listen = False
+        # self.listen = False
         self.board = [[' '] * self.size[1] for i in range(self.size[0])]
         for i in range(self.obstacles.__len__()):
             self.board[self.obstacles[i][0]][self.obstacles[i][1]] = 'X'
@@ -50,14 +50,14 @@ class Snake():
         global choice
         if key == keyboard.Key.esc:
             choice = 'q'
-        elif self.listen == True:
+        else: #if self.listen == True:
             try:
                 if key.char in ['w', 's'] and self.direction in ['a', 'd']:
                     self.direction = key.char
-                    self.listen = False
+                    # self.listen = False
                 if key.char in ['a', 'd'] and self.direction in ['w', 's']:
                     self.direction = key.char
-                    self.listen = False
+                    # self.listen = False
             except AttributeError:
                 print('Use: W A S D to control the snake')
 
@@ -89,7 +89,14 @@ class Snake():
             self.snake_position[0] = [self.snake_position[0][0] + 1, self.snake_position[0][1]]
         elif self.direction == 'a':
             self.snake_position[0] = [self.snake_position[0][0], self.snake_position[0][1] - 1]
-        # Snake went out of the board
+        self.if_snake_out_of_board()
+        self.if_snake_in_obstacle()
+        self.if_snake_rached_gate()
+        self.if_snake_ate_apple()
+        self.check_snake_length()
+
+    # Snake went out of the board
+    def if_snake_out_of_board(self):
         if self.snake_position.count(self.snake_position[0]) > 1 \
                 or self.snake_position[0][0] < 0 or self.snake_position[0][0] >= self.size[0] \
                 or self.snake_position[0][1] < 0 or self.snake_position[0][1] >= self.size[1]:
@@ -100,7 +107,9 @@ class Snake():
             if self.lifes == 0:
                 choice = 'q'
             return 0
-        # snake went  into a obstacle
+
+    # snake went  into a obstacle
+    def if_snake_in_obstacle(self):
         if self.board[self.snake_position[0][0]][self.snake_position[0][1]] == 'X':
             _ = system('cls')
             print("Looooooooser!!!")
@@ -109,12 +118,16 @@ class Snake():
             if self.lifes == 0:
                 choice = 'q'
             return 0
-        # snake reached the gate
+
+    # snake reached the gate
+    def if_snake_rached_gate(self):
         if self.board[self.snake_position[0][0]][self.snake_position[0][1]] == 'G':
             self.level = self.level + 1
             self.lifes = 3
             return 2
-        # snake ate apple
+
+    # snake ate apple
+    def if_snake_ate_apple(self):
         if self.board[self.snake_position[0][0]][self.snake_position[0][1]] == 'A':
             # print([i for i in self.apples if i[0] == [self.snake_position[0][0], self.snake_position[0][1]]])
             # print(self.apples.__len__())
@@ -122,7 +135,9 @@ class Snake():
             self.board[self.snake_position[0][0]][self.snake_position[0][1]] = ' '
             self.snake_position.append([self.snake_position[-1][0] - (self.snake_position[-2][0] - self.snake_position[-1][0]),
                                         self.snake_position[-1][1] - (self.snake_position[-2][1] - self.snake_position[-1][1])])
-        # snake reached required length to go to the next level
+
+    # snake reached required length to go to the next level
+    def check_snake_length(self):
         if self.snake_position.__len__() >= self.level * 1 + 8 and self.gate == []:
             self.gate = [random.randint(0, self.size[0] - 1), random.randint(0, self.size[1] - 1)]
             while self.gate in (self.obstacles + self.snake_position):
@@ -154,9 +169,9 @@ class Snake():
             while choice != 'q':
                 _ = system('cls')
                 self.print_game_board()
-                self.listen = True
+                # self.listen = True
                 time.sleep(1/self.level)
-                self.listen = False
+                # self.listen = False
                 if self.move() in [0, 2]:
                     # self.lifes = self.lifes - 1
                     # if self.lifes == 0:
